@@ -50,16 +50,16 @@ createMacro:
 		OnMessage(0x44, "")
 
 		IfMsgBox Yes, {
-			Generar()
+			Trigger()
 		}
 	}
 	else
 	{
-		Generar()
+		Trigger()
 	}
 Return
 
-Generar()
+Trigger()
 {
 	if(!instantPaste)
 	{

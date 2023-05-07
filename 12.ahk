@@ -2,5 +2,5 @@
 #SingleInstance, Force
 SetBatchLines, -1
 #NoTrayIcon
-SetWorkingDir C:\Users\victo\Desktop
-Run,  https://twitter.com/elModo7
+SetWorkingDir C:\Users\%A_UserName%\Desktop
+Run,  https://twitter.com/

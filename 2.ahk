@@ -4,11 +4,11 @@ SetBatchLines, -1
 #NoTrayIcon
 SetWorkingDir C:\Windows\System32
 
-global Ejecutable := "mspaint.exe"
+global Executable := "mspaint.exe"
 
-IfWinExist, ahk_exe %Ejecutable%
+IfWinExist, ahk_exe %Executable%
 {
-	WinActivate, ahk_exe %Ejecutable%
+	WinActivate, ahk_exe %Executable%
 }
 else
 {

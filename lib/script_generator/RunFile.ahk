@@ -69,16 +69,16 @@ createMacro:
 		OnMessage(0x44, "")
 
 		IfMsgBox Yes, {
-			Generar()
+			Trigger()
 		}
 	}
 	else
 	{
-		Generar()
+		Trigger()
 	}
 Return
 
-Generar()
+Trigger()
 {
 	if(!switchIfExist && !runAsAdmin)
 	{
@@ -102,11 +102,11 @@ SetBatchLines, -1
 #NoTrayIcon
 SetWorkingDir %workingDir%
 
-global Ejecutable := "%fileName%"
+global Executable := "%fileName%"
 
-IfWinExist, ahk_exe `%Ejecutable`%
+IfWinExist, ahk_exe `%Executable`%
 {
-	WinActivate, ahk_exe `%Ejecutable`%
+	WinActivate, ahk_exe `%Executable`%
 }
 else
 {
@@ -128,11 +128,11 @@ if not A_IsAdmin
 }
 SetWorkingDir %workingDir%
 
-global Ejecutable := "%fileName%"
+global Executable := "%fileName%"
 
-IfWinExist, ahk_exe `%Ejecutable`%
+IfWinExist, ahk_exe `%Executable`%
 {
-	WinActivate, ahk_exe `%Ejecutable`%
+	WinActivate, ahk_exe `%Executable`%
 }
 else
 {

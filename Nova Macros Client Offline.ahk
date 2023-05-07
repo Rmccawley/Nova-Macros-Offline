@@ -14,17 +14,17 @@ SetWorkingDir %A_ScriptDir%
 DetectHiddenWindows, On
 CoordMode,Mouse,Screen
 #Include, <nm_msg>
-global EsVisible = true
-global EnCarpeta := MoverRatonAlPulsarBoton := MiniClient := SiempreVisible := enviarAltTabAlPulsarBoton := false
-global Variable, Valor, ValorAnterior, ProgramasRegistrados, PaginasAsociadas, BotonesDuales, CarpetaBoton, PaginaCarpeta, RutaEditorScripts, ExtensionScripts, BotonActivo, BotonAPulsar, windowHandler
-global VariableCambioImagen = 0
-global RutaBoton1, RutaBoton2, RutaBoton3, RutaBoton4, RutaBoton5, RutaBoton6, RutaBoton7, RutaBoton8, RutaBoton9, RutaBoton10, RutaBoton11, RutaBoton12, RutaBoton13, RutaBoton14, RutaBoton15
-global EstadosBotonesDuales := []
-global feedbackEjecucion := []
-global NumeroPagina := cargaProgresivaIconos := 0
+global IsVisible = true
+global InFolder := MoveMouseOnButtonPress := MiniClient := AlwaysVisible := SendAltTabOnButtonPress := false
+global Variable, Valor, PreviousValue, RegisteredPrograms, AssociatedPages, DualButtons, ButtonFolder, FolderPage, PathEditorScripts, ExtensionScripts, ActiveButton, ButtonAPress, windowHandler
+global VariableChangeImage = 0
+global Button1Path, Button2Path, Button3Path, Button4Path, Button5Path, Button6Path, Button7Path, Button8Path, Button9Path, Button1Path0, Button1Path1, Button1Path2, Button1Path3, Button1Path4, Button1Path5
+global DualButtonsStates := []
+global feedbackExecution := []
+global PageNumber := ProgressLoadingIcons := 0
 global MsgBoxBtn1, MsgBoxBtn2, MsgBoxBtn3, MsgBoxBtn4
-global Pantalla_Mitad_X := A_ScreenWidth / 2
-global Pantalla_Mitad_Y := A_ScreenHeight / 2
+global Screen_Half_X := A_ScreenWidth / 2
+global Screen_Half_Y := A_ScreenHeight / 2
 global ClientVersion := "2.7 Offline"
 FileCreateDir, conf
 
@@ -34,49 +34,49 @@ if(!FileExist("./conf/ProgramPages.txt"))
 	FileAppend, 0|3|1, ./conf/ProgramPages.txt
 }
 
-;~ Cargar Programas asociados a páginas
-NumeroLoop := 1
+;~ Load Programs associated with pages
+NumberLoop := 1
 Loop, read, ./conf/ProgramPages.txt
 {
     StringSplit, LineArray, A_LoopReadLine, %A_Tab%
-	if(NumeroLoop == "1")
+	if(NumberLoop == "1")
 	{
-	    ProgramasRegistradosRead := LineArray1
+	    RegisteredProgramsRead := LineArray1
 	}
-	else if(NumeroLoop == "2")
+	else if(NumberLoop == "2")
 	{
-		PaginasAsociadasRead := LineArray1
+		AssociatedPagesRead := LineArray1
 	}
-	NumeroLoop++
+	NumberLoop++
 }
-StringSplit, ProgramasRegistrados, ProgramasRegistradosRead, |, ; Creo el array ProgramasRegistrados del string ProgramasRegistradosRead, separando elementos por coma, ProgramasRegistrados0 contiene el count de elementos, y ProgramasRegistrados1, ProgramasRegistrados2... son los campos del array
-StringSplit, PaginasAsociadas, PaginasAsociadasRead, |,
-global ProgramasRegistrados0
+StringSplit, RegisteredPrograms, RegisteredProgramsRead, |, ; I create the RegisteredPrograms array from the RegisteredProgramsRead string, separating elements by complus, RegisteredPrograms0 contains the element count, and RegisteredPrograms1, RegisteredPrograms2... are the fields of the array
+StringSplit, AssociatedPages, AssociatedPagesRead, |,
+global RegisteredPrograms0
 
 if(!FileExist("./conf/FolderButtons.txt"))
 {
 	FileAppend, 6|7`n, ./conf/FolderButtons.txt
-	FileAppend, UtilesStream|SonidosOBS, ./conf/FolderButtons.txt
+	FileAppend, UtilesStream|SoundsOBS, ./conf/FolderButtons.txt
 }
 
-;~ Cargar Botones asociados a carpetas
-NumeroLoop := 1
+;~ Load Buttons associated with folders
+NumberLoop := 1
 Loop, read, ./conf/FolderButtons.txt
 {
     StringSplit, LineArray, A_LoopReadLine, %A_Tab%
-	if(NumeroLoop == "1")
+	if(NumberLoop == "1")
 	{
-	    BotonesCarpetasRead := LineArray1
+	    ButtonsFoldersRead := LineArray1
 	}
-	else if(NumeroLoop == "2")
+	else if(NumberLoop == "2")
 	{
-		CarpetasBotonesRead := LineArray1
+		FoldersButtonsRead := LineArray1
 	}
-	NumeroLoop++
+	NumberLoop++
 }
-StringSplit, BotonesCarpetas, BotonesCarpetasRead, |,
-StringSplit, CarpetasBotones, CarpetasBotonesRead, |,
-global BotonesCarpetas0
+StringSplit, ButtonsFolders, ButtonsFoldersRead, |,
+StringSplit, FoldersButtons, FoldersButtonsRead, |,
+global ButtonsFolders0
 
 if(!FileExist("./conf/DualButtons.txt"))
 {
@@ -84,30 +84,30 @@ if(!FileExist("./conf/DualButtons.txt"))
 	FileAppend, 4Enabled|5Enabled, ./conf/DualButtons.txt
 }
 
-;~ Cargar Botones Duales
-NumeroLoop := 1
+;~ Load Dual Buttons
+NumberLoop := 1
 Loop, read, ./conf/DualButtons.txt
 {
     StringSplit, LineArray, A_LoopReadLine, %A_Tab%
-	if(NumeroLoop == "1")
+	if(NumberLoop == "1")
 	{
-	    BotonesDualesRead := LineArray1
+	    DualButtonsRead := LineArray1
 	}
-	else if(NumeroLoop == "2")
+	else if(NumberLoop == "2")
 	{
-		AccionesDualesRead := LineArray1
+		DualActionsRead := LineArray1
 	}
-	NumeroLoop++
+	NumberLoop++
 }
-StringSplit, BotonesDuales, BotonesDualesRead, |,
-StringSplit, AccionesDualesRead, AccionesDualesRead, |,
-global BotonesDuales0
+StringSplit, DualButtons, DualButtonsRead, |,
+StringSplit, DualActionsRead, DualActionsRead, |,
+global DualButtons0
 
-; Poner los botones duales a 0
+; Set the dual buttons to 0
 i = 1
-while(i <= BotonesDuales0)
+while(i <= DualButtons0)
 {
-	EstadosBotonesDuales.Push(0)
+	DualButtonsStates.Push(0)
 	i++
 }
 
@@ -135,24 +135,24 @@ else
 ; *******************************
 Menu, tray, NoStandard
 Menu, tray, add, Hide, ToggleHide
-Menu, tray, add, Set Editor Path, CambiarRutaEditor
+Menu, tray, add, Set Editor Path, ChangeEditorPath
 Menu, tray, add
 Menu, tray, add, Exit, Exit
 
-; CONTEXT MENU GENERICO
+; GENERIC CONTEXT MENU
 ; *******************************
-Menu ContextMenuGenerico, Add, Always on Top, SiempreVisible
-Menu ContextMenuGenerico, UnCheck, Always on Top
-Menu ContextMenuGenerico, Add, Center Mouse after Activation, MoverRatonAlPulsarBotonToggle
-Menu ContextMenuGenerico, UnCheck, Center Mouse after Activation
-Menu ContextMenuGenerico, Add, Send Alt+Tab after Activation, enviarAltTabAlPulsarBotonToggle
-Menu ContextMenuGenerico, UnCheck, Send Alt+Tab after Activation
-Menu ContextMenuGenerico, Add, Progressive Icon Loading, cargaProgresivaIconosToggle
-Menu ContextMenuGenerico, UnCheck, Progressive Icon Loading
-Menu ContextMenuGenerico, Add, Mini Client, CambiarDimensionesCliente
-Menu ContextMenuGenerico, UnCheck, Mini Client
+Menu GenericContextMenu, Add, Always on Top, AlwaysVisible
+Menu GenericContextMenu, UnCheck, Always on Top
+Menu GenericContextMenu, Add, Center Mouse after Activation, MoveMouseToggleButtonPress
+Menu GenericContextMenu, UnCheck, Center Mouse after Activation
+Menu GenericContextMenu, Add, Send Alt+Tab after Activation, SendAltTabOnToggleButtonPress
+Menu GenericContextMenu, UnCheck, Send Alt+Tab after Activation
+Menu GenericContextMenu, Add, Progressive Icon Loading, ProgressLoadingIconsToggle
+Menu GenericContextMenu, UnCheck, Progressive Icon Loading
+Menu GenericContextMenu, Add, Mini Client, ChangeDimensionsClient
+Menu GenericContextMenu, UnCheck, Mini Client
 
-; CONTEXT MENU BOTONES
+; CONTEXT MENU BUTTONS
 ; *******************************
 Menu scriptGenerator, Add, Run File, ScriptGenerator_RunFile
 Menu scriptGenerator, Icon, Run File, shell32.dll, 25
@@ -255,14 +255,14 @@ Menu scriptGenerator, Icon, Quick Actions, imageres.dll, 293
 Menu scriptGenerator, Add, Hidden Function Keys (F13-F24), :FunctionKeysMenu
 Menu scriptGenerator, Icon, Hidden Function Keys (F13-F24), imageres.dll, 174
 
-Menu ContextMenu, Add, Edit Script`tShift + Click, GuiEditarScript
+Menu ContextMenu, Add, Edit Script`tShift + Click, GuiEditScript
 Menu ContextMenu, Default, Edit Script`tShift + Click
 Menu ContextMenu, Icon, Edit Script`tShift + Click, shell32.dll, 85
 Menu ContextMenu, Add, Script Generator`tAlt + Right Click, :scriptGenerator
 Menu ContextMenu, Icon, Script Generator`tAlt + Right Click, shell32.dll, 22
-Menu ContextMenu, Add, Change/Del Image`tCtrl + Shift + Click, GuiCambiarImagenBoton
+Menu ContextMenu, Add, Change/Del Image`tCtrl + Shift + Click, GuiChangeImageButton
 Menu ContextMenu, Icon, Change/Del Image`tCtrl + Shift + Click, shell32.dll, 142
-Menu ContextMenu, Add, Button Name`tCtrl + Click, GuiInfoBoton
+Menu ContextMenu, Add, Button Name`tCtrl + Click, GuiInfoButton
 Menu ContextMenu, Icon, Button Name`tCtrl + Click, shell32.dll, 24
 Menu ContextMenu, Add, Create Folder Button, CreateFolderButton
 Menu ContextMenu, Icon, Create Folder Button, shell32.dll, 280
@@ -275,52 +275,52 @@ Menu ContextMenu, Icon, Delete Button Function, shell32.dll, 132
 ; *******************************
 Gui, Color, 282828
 Gui -Caption +LastFound +ToolWindow +HwndwindowHandler +E0x02000000 +E0x00080000 +AlwaysOnTop
-; Fila1
-Gui Add, Picture, +BackgroundTrans gBoton1 vBoton1, resources\img\1.png
-Gui Add, Picture, +BackgroundTrans gBoton2 vBoton2, resources\img\2.png
-Gui Add, Picture, +BackgroundTrans gBoton3 vBoton3, resources\img\3.png
-Gui Add, Picture, +BackgroundTrans gBoton4 vBoton4, resources\img\4.png
-Gui Add, Picture, +BackgroundTrans gBoton5 vBoton5, resources\img\5.png
-; Fila2
-Gui Add, Picture, +BackgroundTrans gBoton6 vBoton6, resources\img\6.png
-Gui Add, Picture, +BackgroundTrans gBoton7 vBoton7, resources\img\7.png
-Gui Add, Picture, +BackgroundTrans gBoton8 vBoton8, resources\img\8.png
-Gui Add, Picture, +BackgroundTrans gBoton9 vBoton9, resources\img\9.png
-Gui Add, Picture, +BackgroundTrans gBoton10 vBoton10, resources\img\10.png
-; Fila3
-Gui Add, Picture, +BackgroundTrans gBoton11 vBoton11, resources\img\11.png
-Gui Add, Picture, +BackgroundTrans gBoton12 vBoton12, resources\img\12.png
-Gui Add, Picture, +BackgroundTrans gBoton13 vBoton13, resources\img\13.png
-Gui Add, Picture, +BackgroundTrans gBoton14 vBoton14, resources\img\14.png
-Gui Add, Picture, +BackgroundTrans gBoton15 vBoton15, resources\img\15.png
-; Fondos Activaciones Botones
-Gui Add, Picture, vActivar1 Hidden x120 y40 w150 h150,resources\img\FondoActivacion.png
-Gui Add, Picture, vActivar2 Hidden x280 y40 w150 h150,resources\img\FondoActivacion.png
-Gui Add, Picture, vActivar3 Hidden x440 y40 w150 h150,resources\img\FondoActivacion.png
-Gui Add, Picture, vActivar4 Hidden x600 y40 w150 h150,resources\img\FondoActivacion.png
-Gui Add, Picture, vActivar5 Hidden x760 y40 w150 h150,resources\img\FondoActivacion.png
-Gui Add, Picture, vActivar6 Hidden x120 y220 w150 h150,resources\img\FondoActivacion.png
-Gui Add, Picture, vActivar7 Hidden x280 y220 w150 h150,resources\img\FondoActivacion.png
-Gui Add, Picture, vActivar8 Hidden x440 y220 w150 h150,resources\img\FondoActivacion.png
-Gui Add, Picture, vActivar9 Hidden x600 y220 w150 h150,resources\img\FondoActivacion.png
-Gui Add, Picture, vActivar10 Hidden x760 y220 w150 h150,resources\img\FondoActivacion.png
-Gui Add, Picture, vActivar11 Hidden x120 y400 w150 h150,resources\img\FondoActivacion.png
-Gui Add, Picture, vActivar12 Hidden x280 y400 w150 h150,resources\img\FondoActivacion.png
-Gui Add, Picture, vActivar13 Hidden x440 y400 w150 h150,resources\img\FondoActivacion.png
-Gui Add, Picture, vActivar14 Hidden x600 y400 w150 h150,resources\img\FondoActivacion.png
-Gui Add, Picture, vActivar15 Hidden x760 y400 w150 h150,resources\img\FondoActivacion.png
-; Botones Página
+; Row1
+Gui Add, Picture, +BackgroundTrans gButton1 vButton1, resources\img\1.png
+Gui Add, Picture, +BackgroundTrans gButton2 vButton2, resources\img\2.png
+Gui Add, Picture, +BackgroundTrans gButton3 vButton3, resources\img\3.png
+Gui Add, Picture, +BackgroundTrans gButton4 vButton4, resources\img\4.png
+Gui Add, Picture, +BackgroundTrans gButton5 vButton5, resources\img\5.png
+; Row2
+Gui Add, Picture, +BackgroundTrans gButton6 vButton6, resources\img\6.png
+Gui Add, Picture, +BackgroundTrans gButton7 vButton7, resources\img\7.png
+Gui Add, Picture, +BackgroundTrans gButton8 vButton8, resources\img\8.png
+Gui Add, Picture, +BackgroundTrans gButton9 vButton9, resources\img\9.png
+Gui Add, Picture, +BackgroundTrans gButton10 vButton10, resources\img\10.png
+; Row3
+Gui Add, Picture, +BackgroundTrans gButton11 vButton11, resources\img\11.png
+Gui Add, Picture, +BackgroundTrans gButton12 vButton12, resources\img\12.png
+Gui Add, Picture, +BackgroundTrans gButton13 vButton13, resources\img\13.png
+Gui Add, Picture, +BackgroundTrans gButton14 vButton14, resources\img\14.png
+Gui Add, Picture, +BackgroundTrans gButton15 vButton15, resources\img\15.png
+; Backgrounds Activations Buttons
+Gui Add, Picture, vActivate1 Hidden x120 y40 w150 h150,resources\img\FondoActivation.png
+Gui Add, Picture, vActivate2 Hidden x280 y40 w150 h150,resources\img\FondoActivation.png
+Gui Add, Picture, vActivate3 Hidden x440 y40 w150 h150,resources\img\FondoActivation.png
+Gui Add, Picture, vActivate4 Hidden x600 y40 w150 h150,resources\img\FondoActivation.png
+Gui Add, Picture, vActivate5 Hidden x760 y40 w150 h150,resources\img\FondoActivation.png
+Gui Add, Picture, vActivate6 Hidden x120 y220 w150 h150,resources\img\FondoActivation.png
+Gui Add, Picture, vActivate7 Hidden x280 y220 w150 h150,resources\img\FondoActivation.png
+Gui Add, Picture, vActivate8 Hidden x440 y220 w150 h150,resources\img\FondoActivation.png
+Gui Add, Picture, vActivate9 Hidden x600 y220 w150 h150,resources\img\FondoActivation.png
+Gui Add, Picture, vActivate10 Hidden x760 y220 w150 h150,resources\img\FondoActivation.png
+Gui Add, Picture, vActivate11 Hidden x120 y400 w150 h150,resources\img\FondoActivation.png
+Gui Add, Picture, vActivate12 Hidden x280 y400 w150 h150,resources\img\FondoActivation.png
+Gui Add, Picture, vActivate13 Hidden x440 y400 w150 h150,resources\img\FondoActivation.png
+Gui Add, Picture, vActivate14 Hidden x600 y400 w150 h150,resources\img\FondoActivation.png
+Gui Add, Picture, vActivate15 Hidden x760 y400 w150 h150,resources\img\FondoActivation.png
+; Buttons Page
 Gui Add, Picture, +BackgroundTrans gRightPage vRightPage x910 y240 w130 h130, resources\img\RightPage.png
 Gui Add, Picture, +BackgroundTrans gLeftPage vLeftPage x0 y240 w130 h130, resources\img\LeftPage.png
-; Fondo y secciones mover
+; Background and sections move
 Gui Add, Picture, x0 y0 w1024 h600, resources\img\background.jpg
-Gui, Add, Text, x0 y0 w1024 h50 cWhite Center GMoverVentana vMoverVentanaUp, ; Mover Ventana de arriba
-Gui, Add, Text, x0 y570 w1024 h50 cWhite Center GMoverVentana vMoverVentanaDown, ; Mover Ventana de abajo
-EstablecerPagina(0)
+Gui, Add, Text, x0 y0 w1024 h50 cWhite Center GMoveWindow vMoveWindowUp, ; Move Ventana de arriba
+Gui, Add, Text, x0 y570 w1024 h50 cWhite Center GMoveWindow vMoveWindowDown, ; Move Ventana de abajo
+SetPage(0)
 Gui Show, w1024 h600, Nova Macros Client
 Return
 
-; LABELS BOTONES Y FUNCIONES GENERALES
+; LABELS BUTTONS AND GENERAL FUNCTIONS
 ; *******************************
 Show:
 if WinExist("Nova Macros Client"){
@@ -329,18 +329,18 @@ if WinExist("Nova Macros Client"){
 Return
 
 ToggleHide:
-if EsVisible
+if IsVisible
 {
 	WinHide, Nova Macros Client
 	Menu, tray, Rename, Hide, Show
-	EsVisible = 0
+	IsVisible = 0
 }
 else
 {
 	WinShow, Nova Macros Client
 	WinActivate, Nova Macros Client
 	Menu, tray, Rename, Show, Hide
-	EsVisible = 1
+	IsVisible = 1
 }
 Return
 
@@ -349,13 +349,13 @@ GuiContextMenu:
 		scriptGen := 1
 	else
 		scriptGen := 0
-	if A_GuiControl In Boton1,Boton2,Boton3,Boton4,Boton5,Boton6,Boton7,Boton8,Boton9,Boton10,Boton11,Boton12,Boton13,Boton14,Boton15
+	if A_GuiControl In Button1,Button2,Button3,Button4,Button5,Button6,Button7,Button8,Button9,Button10,Button11,Button12,Button13,Button14,Button15
 	{
-		StringReplace, BotonAPulsar, A_GuiControl, boton,
-		if(EnCarpeta)
-			BotonActivo := CarpetaBoton 15*PaginaCarpeta+BotonAPulsar
+		StringReplace, ButtonAPress, A_GuiControl, button,
+		if(InFolder)
+			ActiveButton := ButtonFolder 15*FolderPage+ButtonAPress
 		else
-			BotonActivo := 15*NumeroPagina+BotonAPulsar
+			ActiveButton := 15*PageNumber+ButtonAPress
 		if (scriptGen)
 		{
 			KeyWait, Alt,
@@ -367,254 +367,254 @@ GuiContextMenu:
 		}
 	}
 	else
-		Menu ContextMenuGenerico, Show
+		Menu GenericContextMenu, Show
 return
 
-GuiEditarScript:
-	EditarScriptBoton(BotonActivo)
+GuiEditScript:
+	EditScriptButton(ActiveButton)
 return
 
-GuiCambiarImagenBoton:
-	EstablecerImagenBoton(BotonActivo)
+GuiChangeImageButton:
+	SetImageButton(ActiveButton)
 return
 
-GuiInfoBoton:
-	MsgBox,,Button ID, Clicked button Id is: %BotonActivo%
+GuiInfoButton:
+	MsgBox,,Button ID, Clicked button Id is: %ActiveButton%
 return
 
 ScriptGenerator_RunFile:
-	Run, "lib\script_generator\RunFile.ahk" %BotonActivo%
+	Run, "lib\script_generator\RunFile.ahk" %ActiveButton%
 return
 
 ScriptGenerator_RunCmd:
-	Run, "lib\script_generator\RunCmd.ahk" %BotonActivo%
+	Run, "lib\script_generator\RunCmd.ahk" %ActiveButton%
 return
 
 ScriptGenerator_SendText:
-	Run, "lib\script_generator\SendTextBlock.ahk" %BotonActivo%
+	Run, "lib\script_generator\SendTextBlock.ahk" %ActiveButton%
 return
 
 ScriptGenerator_Hotkey:
-	Run, "lib\script_generator\HotkeyCreator.ahk" %BotonActivo%
+	Run, "lib\script_generator\HotkeyCreator.ahk" %ActiveButton%
 return
 
 ScriptGenerator_Multimedia_PlayPause:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_Multimedia_PlayPause.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_Multimedia_PlayPause.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_Multimedia_Stop:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_Multimedia_Stop.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_Multimedia_Stop.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_Multimedia_Next:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_Multimedia_Next.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_Multimedia_Next.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_Multimedia_Previous:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_Multimedia_Previous.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_Multimedia_Previous.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_Multimedia_MoreVolume:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_Multimedia_MoreVolume.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_Multimedia_MoreVolume.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_Multimedia_LessVolume:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_Multimedia_LessVolume.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_Multimedia_LessVolume.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_Multimedia_Mute:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_Multimedia_Mute.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_Multimedia_Mute.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_FunctionKeys_F13:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F13.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F13.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_FunctionKeys_F14:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F14.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F14.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_FunctionKeys_F15:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F15.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F15.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_FunctionKeys_F16:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F16.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F16.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_FunctionKeys_F17:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F17.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F17.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_FunctionKeys_F18:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F18.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F18.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_FunctionKeys_F19:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F19.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F19.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_FunctionKeys_F20:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F20.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F20.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_FunctionKeys_F21:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F21.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F21.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_FunctionKeys_F22:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F22.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F22.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_FunctionKeys_F23:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F23.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F23.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_FunctionKeys_F24:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F24.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_FunctionKeys_F24.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_WebBrowser_NextTab:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_WebBrowser_NextTab.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_WebBrowser_NextTab.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_WebBrowser_PreviousTab:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_WebBrowser_PreviousTab.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_WebBrowser_PreviousTab.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_WebBrowser_NewTab:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_WebBrowser_NewTab.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_WebBrowser_NewTab.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_WebBrowser_NewWindow:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_WebBrowser_NewWindow.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_WebBrowser_NewWindow.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_WebBrowser_CloseTab:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_WebBrowser_CloseTab.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_WebBrowser_CloseTab.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_WebBrowser_RestoreTab:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_WebBrowser_RestoreTab.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_WebBrowser_RestoreTab.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_WebBrowser_ChromePrivWindow:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_WebBrowser_ChromePrivWindow.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_WebBrowser_ChromePrivWindow.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_QuickActions_CloseWindow:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_CloseWindow.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_CloseWindow.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_QuickActions_Maximize:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_Maximize.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_Maximize.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_QuickActions_Minimize:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_Minimize.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_Minimize.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_QuickActions_ShowDesktop:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_ShowDesktop.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_ShowDesktop.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_QuickActions_NewExplorer:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_NewExplorer.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_NewExplorer.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_QuickActions_NewFolder:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_NewFolder.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_NewFolder.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_QuickActions_QuickRename:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_QuickRename.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_QuickRename.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_QuickActions_LockPC:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_LockPC.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_LockPC.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_QuickActions_Shutdown:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_Shutdown.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_Shutdown.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_QuickActions_SystemInfo:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_SystemInfo.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_SystemInfo.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_QuickActions_FullSystemInfo:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_FullSystemInfo.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_FullSystemInfo.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_QuickActions_Cmd:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_Cmd.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_Cmd.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_QuickActions_PowerShell:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_PowerShell.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_PowerShell.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_QuickActions_ScreenShot:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_ScreenShot.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_ScreenShot.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_QuickActions_SnipImage:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_SnipImage.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_SnipImage.ahk,%ActiveButton%.ahk,1
 return
 
 ScriptGenerator_QuickActions_GamePanel:
-	if(ComprobarExistenciaBoton())
-		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_GamePanel.ahk,%BotonActivo%.ahk,1
+	if(ButtonExists())
+		FileCopy, lib\script_generator\code_snippets\ScriptGenerator_QuickActions_GamePanel.ahk,%ActiveButton%.ahk,1
 return
 
 NotImplemented:
 	MsgBox, Not implemented
 return
 
-ComprobarExistenciaBoton()
+ButtonExists()
 {
-	buttonPath := "" BotonActivo ".ahk"
+	buttonPath := "" ActiveButton ".ahk"
 	if FileExist(buttonPath)
 	{
 		OnMessage(0x44, "OnMsgBox")
@@ -635,559 +635,559 @@ ComprobarExistenciaBoton()
 	}
 }
 
-SiempreVisible:
-	if(SiempreVisible)
+AlwaysVisible:
+	if(AlwaysVisible)
 	{
-		Winset, AlwaysOnTop, Off, A
-		SiempreVisible := 0
-		Menu ContextMenuGenerico, UnCheck, Always on Top
+		WinSet, AlwaysOnTop, Off, A
+		AlwaysVisible := 0
+		Menu GenericContextMenu, UnCheck, Always on Top
 	}
 	else
 	{
-		Winset, AlwaysOnTop, , A
-		SiempreVisible := 1
-		Menu ContextMenuGenerico, Check, Always on Top
+		WinSet, AlwaysOnTop, , A
+		AlwaysVisible := 1
+		Menu GenericContextMenu, Check, Always on Top
 	}
 return
 
-MoverRatonAlPulsarBotonToggle:
-	if(MoverRatonAlPulsarBoton)
+MoveMouseToggleButtonPress:
+	if(MoveMouseOnButtonPress)
 	{
-		MoverRatonAlPulsarBoton := 0
-		Menu ContextMenuGenerico, UnCheck, Center Mouse after Activation
+		MoveMouseOnButtonPress := 0
+		Menu GenericContextMenu, UnCheck, Center Mouse after Activation
 	}
 	else
 	{
-		MoverRatonAlPulsarBoton := 1
-		Menu ContextMenuGenerico, Check, Center Mouse after Activation
+		MoveMouseOnButtonPress := 1
+		Menu GenericContextMenu, Check, Center Mouse after Activation
 	}
 return
 
-enviarAltTabAlPulsarBotonToggle:
-	if(enviarAltTabAlPulsarBoton)
+SendAltTabOnToggleButtonPress:
+	if(SendAltTabOnButtonPress)
 	{
-		enviarAltTabAlPulsarBoton := 0
-		Menu ContextMenuGenerico, UnCheck, Send Alt+Tab after Activation
+		SendAltTabOnButtonPress := 0
+		Menu GenericContextMenu, UnCheck, Send Alt+Tab after Activation
 	}
 	else
 	{
-		enviarAltTabAlPulsarBoton := 1
-		Menu ContextMenuGenerico, Check, Send Alt+Tab after Activation
+		SendAltTabOnButtonPress := 1
+		Menu GenericContextMenu, Check, Send Alt+Tab after Activation
 	}
 return
 
-cargaProgresivaIconosToggle:
-	if(cargaProgresivaIconos)
+ProgressLoadingIconsToggle:
+	if(ProgressLoadingIcons)
 	{
-		cargaProgresivaIconos := 0
-		Menu ContextMenuGenerico, UnCheck, Progressive Icon Loading
+		ProgressLoadingIcons := 0
+		Menu GenericContextMenu, UnCheck, Progressive Icon Loading
 	}
 	else
 	{
-		cargaProgresivaIconos := 1
-		Menu ContextMenuGenerico, Check, Progressive Icon Loading
+		ProgressLoadingIcons := 1
+		Menu GenericContextMenu, Check, Progressive Icon Loading
 	}
 return
  
-CambiarDimensionesCliente:
-if(!cargaProgresivaIconos)
+ChangeDimensionsClient:
+if(!ProgressLoadingIcons)
 	DllCall("LockWindowUpdate", "UInt", windowHandler)
 if MiniClient
 {
-	Menu, ContextMenuGenerico, Rename, Normal Client, Mini Client
+	Menu, GenericContextMenu, Rename, Normal Client, Mini Client
 	MiniClient = 0
-	GuiControl, MoveDraw, Activar1, x120 y40 w150 h150
-	GuiControl, MoveDraw, Activar2, x280 y40 w150 h150
-	GuiControl, MoveDraw, Activar3, x440 y40 w150 h150
-	GuiControl, MoveDraw, Activar4, x600 y40 w150 h150
-	GuiControl, MoveDraw, Activar5, x760 y40 w150 h150
-	GuiControl, MoveDraw, Activar6, x120 y220 w150 h150
-	GuiControl, MoveDraw, Activar7, x280 y220 w150 h150
-	GuiControl, MoveDraw, Activar8, x440 y220 w150 h150
-	GuiControl, MoveDraw, Activar9, x600 y220 w150 h150
-	GuiControl, MoveDraw, Activar10, x760 y220 w150 h150
-	GuiControl, MoveDraw, Activar11, x120 y400 w150 h150
-	GuiControl, MoveDraw, Activar12, x280 y400 w150 h150
-	GuiControl, MoveDraw, Activar13, x440 y400 w150 h150
-	GuiControl, MoveDraw, Activar14, x600 y400 w150 h150
-	GuiControl, MoveDraw, Activar15, x760 y400 w150 h150
+	GuiControl, MoveDraw, Activate1, x120 y40 w150 h150
+	GuiControl, MoveDraw, Activate2, x280 y40 w150 h150
+	GuiControl, MoveDraw, Activate3, x440 y40 w150 h150
+	GuiControl, MoveDraw, Activate4, x600 y40 w150 h150
+	GuiControl, MoveDraw, Activate5, x760 y40 w150 h150
+	GuiControl, MoveDraw, Activate6, x120 y220 w150 h150
+	GuiControl, MoveDraw, Activate7, x280 y220 w150 h150
+	GuiControl, MoveDraw, Activate8, x440 y220 w150 h150
+	GuiControl, MoveDraw, Activate9, x600 y220 w150 h150
+	GuiControl, MoveDraw, Activate10, x760 y220 w150 h150
+	GuiControl, MoveDraw, Activate11, x120 y400 w150 h150
+	GuiControl, MoveDraw, Activate12, x280 y400 w150 h150
+	GuiControl, MoveDraw, Activate13, x440 y400 w150 h150
+	GuiControl, MoveDraw, Activate14, x600 y400 w150 h150
+	GuiControl, MoveDraw, Activate15, x760 y400 w150 h150
 	GuiControl, MoveDraw, LeftPage, x0 y230 w130 h130
 	GuiControl, MoveDraw, RightPage, x910 y230 w130 h130
-	GuiControl, MoveDraw, MoverVentanaUp, x0 y0 w1024 h50
-	GuiControl, MoveDraw, MoverVentanaDown, x0 y570 w1024 h50
+	GuiControl, MoveDraw, MoveWindowUp, x0 y0 w1024 h50
+	GuiControl, MoveDraw, MoveWindowDown, x0 y570 w1024 h50
 	Gui Show, w1024 h600, Nova Macros Client
 }
 else
 {
-	Menu, ContextMenuGenerico, Rename, Mini Client, Normal Client
+	Menu, GenericContextMenu, Rename, Mini Client, Normal Client
 	MiniClient = 1
-	GuiControl, MoveDraw, Activar1, x54 y14 w59 h59
-	GuiControl, MoveDraw, Activar2, x110 y14 w59 h59
-	GuiControl, MoveDraw, Activar3, x166 y14 w59 h59
-	GuiControl, MoveDraw, Activar4, x222 y14 w59 h59
-	GuiControl, MoveDraw, Activar5, x278 y14 w59 h59
-	GuiControl, MoveDraw, Activar6, x54 y70 w59 h59
-	GuiControl, MoveDraw, Activar7, x110 y70 w59 h59
-	GuiControl, MoveDraw, Activar8, x166 y70 w59 h59
-	GuiControl, MoveDraw, Activar9, x222 y70 w59 h59
-	GuiControl, MoveDraw, Activar10, x278 y70 w59 h59
-	GuiControl, MoveDraw, Activar11, x54 y126 w59 h59
-	GuiControl, MoveDraw, Activar12, x110 y126 w59 h59
-	GuiControl, MoveDraw, Activar13, x166 y126 w59 h59
-	GuiControl, MoveDraw, Activar14, x222 y126 w59 h59
-	GuiControl, MoveDraw, Activar15, x278 y126 w59 h59
+	GuiControl, MoveDraw, Activate1, x54 y14 w59 h59
+	GuiControl, MoveDraw, Activate2, x110 y14 w59 h59
+	GuiControl, MoveDraw, Activate3, x166 y14 w59 h59
+	GuiControl, MoveDraw, Activate4, x222 y14 w59 h59
+	GuiControl, MoveDraw, Activate5, x278 y14 w59 h59
+	GuiControl, MoveDraw, Activate6, x54 y70 w59 h59
+	GuiControl, MoveDraw, Activate7, x110 y70 w59 h59
+	GuiControl, MoveDraw, Activate8, x166 y70 w59 h59
+	GuiControl, MoveDraw, Activate9, x222 y70 w59 h59
+	GuiControl, MoveDraw, Activate10, x278 y70 w59 h59
+	GuiControl, MoveDraw, Activate11, x54 y126 w59 h59
+	GuiControl, MoveDraw, Activate12, x110 y126 w59 h59
+	GuiControl, MoveDraw, Activate13, x166 y126 w59 h59
+	GuiControl, MoveDraw, Activate14, x222 y126 w59 h59
+	GuiControl, MoveDraw, Activate15, x278 y126 w59 h59
 	GuiControl, MoveDraw, LeftPage, x0 y75 w49 h49
 	GuiControl, MoveDraw, RightPage, x340 y75 w49 h49
-	GuiControl, MoveDraw, MoverVentanaUp, x-8 y0 w413 h23
-	GuiControl, MoveDraw, MoverVentanaDown, x0 y187 w401 h23
+	GuiControl, MoveDraw, MoveWindowUp, x-8 y0 w413 h23
+	GuiControl, MoveDraw, MoveWindowDown, x0 y187 w401 h23
 	Gui, Show, w385 h200, Nova Macros Client
 }
 DllCall("LockWindowUpdate", "UInt", 0)
-if(EnCarpeta)
+if(InFolder)
 {
-	EstablecerPaginaCarpeta(CarpetaBoton, PaginaCarpeta)
+	SetFolderPage(ButtonFolder, FolderPage)
 }
 else
 {
-	EstaBlecerPagina(NumeroPagina)
+	SetPage(PageNumber)
 }
 Return
 
-MoverVentana:
+MoveWindow:
 PostMessage, 0xA1, 2,,, A 
 Return
 
-Boton1:
-PulsarBoton(1)
+Button1:
+PressButton(1)
 return
 
-Boton2:
-PulsarBoton(2)
+Button2:
+PressButton(2)
 return
 
-Boton3:
-PulsarBoton(3)
+Button3:
+PressButton(3)
 return
 
-Boton4:
-PulsarBoton(4)
+Button4:
+PressButton(4)
 return
 
-Boton5:
-PulsarBoton(5)
+Button5:
+PressButton(5)
 return
 
-Boton6:
-PulsarBoton(6)
+Button6:
+PressButton(6)
 return
 
-Boton7:
-PulsarBoton(7)
+Button7:
+PressButton(7)
 return
 
-Boton8:
-PulsarBoton(8)
+Button8:
+PressButton(8)
 return
 
-Boton9:
-PulsarBoton(9)
+Button9:
+PressButton(9)
 return
 
-Boton10:
-PulsarBoton(10)
+Button10:
+PressButton(10)
 return
 
-Boton11:
-PulsarBoton(11)
+Button11:
+PressButton(11)
 return
 
-Boton12:
-PulsarBoton(12)
+Button12:
+PressButton(12)
 return
 
-Boton13:
-PulsarBoton(13)
+Button13:
+PressButton(13)
 return
 
-Boton14:
-PulsarBoton(14)
+Button14:
+PressButton(14)
 return
 
-Boton15:
-PulsarBoton(15)
+Button15:
+PressButton(15)
 return
 
-PulsarBoton(BotonAPulsar)
+PressButton(ButtonAPress)
 {
-	if(MoverRatonAlPulsarBoton)
-		MouseMove, %Pantalla_Mitad_X%, %Pantalla_Mitad_Y%, 0
+	if(MoveMouseOnButtonPress)
+		MouseMove, %Screen_Half_X%, %Screen_Half_Y%, 0
 	AltTab()
-	; LÃ³gica BotÃ³n
-	if(EnCarpeta)
+	; Button Logic
+	if(InFolder)
 	{
-		if(BotonAPulsar != 15)
+		if(ButtonAPress != 15)
 		{
-			IdBoton := CarpetaBoton 15*PaginaCarpeta+BotonAPulsar
+			IdButton := ButtonFolder 15*FolderPage+ButtonAPress
 			if GetKeyState("Control")
 			{
 				if GetKeyState("Shift")
 				{
-					EstablecerImagenBoton(IdBoton)
+					SetImageButton(IdButton)
 					return
 				}
-				MsgBox,,Button ID, Clicked button Id is: %IdBoton%
+				MsgBox,,Button ID, Clicked button Id is: %IdButton%
 				return
 			}
 			if GetKeyState("Alt")
 			{
-				;CambiarImagenAlternativaBoton(BotonAPulsar, IdBoton)
+				;ChangeAlternativeImageButton(ButtonAPress, IdButton)
 				return
 			}
 			if GetKeyState("Shift")
 			{
-				EditarScriptBoton(IdBoton)
+				EditScriptButton(IdButton)
 				return
 			}
 			i = 1
-			while(i <= BotonesCarpetas0)
+			while(i <= ButtonsFolders0)
 			{
-				BotonIteracion := BotonesCarpetas%i%
-				if(IdBoton = BotonIteracion)
+				ButtonIteration := ButtonsFolders%i%
+				if(IdButton = ButtonIteration)
 				{
-					EnCarpeta = 1
-					CarpetaBoton := CarpetasBotones%i%
-					global PaginaCarpeta := 0
-					EstablecerPaginaCarpeta(CarpetaBoton, PaginaCarpeta)
+					InFolder = 1
+					ButtonFolder := FoldersButtons%i%
+					global FolderPage := 0
+					SetFolderPage(ButtonFolder, FolderPage)
 					return
 				}
 				i++
 			}
 			j = 1
-			while(j <= BotonesDuales0)
+			while(j <= DualButtons0)
 			{
-				if(IdBoton = BotonesDuales%j%)
+				if(IdButton = DualButtons%j%)
 				{
-					if(EstadosBotonesDuales[j] = 0)
+					if(DualButtonsStates[j] = 0)
 					{
-						IdVisual :=IdBoton "Enabled"
-						EstadosBotonesDuales[j] := 1
+						IdVisual :=IdButton "Enabled"
+						DualButtonsStates[j] := 1
 					}
 					else
 					{
-						IdVisual :=IdBoton
-						EstadosBotonesDuales[j] := 0
+						IdVisual :=IdButton
+						DualButtonsStates[j] := 0
 					}
-					Boton%BotonAPulsar% = 1
-					EjecutarFuncionBoton(BotonAPulsar, IdVisual)
+					Button%ButtonAPress% = 1
+					ExecuteFunctionButton(ButtonAPress, IdVisual)
 					return
 				}
 				j++
 			}
-			IdVisual := IdBoton
-			EjecutarFuncionBoton(BotonAPulsar, IdVisual)
+			IdVisual := IdButton
+			ExecuteFunctionButton(ButtonAPress, IdVisual)
 		}
-		else if (BotonAPulsar = 15)
+		else if (ButtonAPress = 15)
 		{
 			; Este es un caso especial ya que si estÃ¡ en carpeta siempre tiene el valor volver (salir fuera de la carpeta)
-			IdBoton := CarpetaBoton 15*PaginaCarpeta+BotonAPulsar
-			EstablecerPagina(NumeroPagina)
-			EnCarpeta = 0
-			PaginaCarpeta = 0
+			IdButton := ButtonFolder 15*FolderPage+ButtonAPress
+			SetPage(PageNumber)
+			InFolder = 0
+			FolderPage = 0
 			return	
 		}
 	}
 	else
 	{
-		IdBoton := 15*NumeroPagina+BotonAPulsar
+		IdButton := 15*PageNumber+ButtonAPress
 		if GetKeyState("Control")
 		{
 			if GetKeyState("Shift")
 			{
-				EstablecerImagenBoton(IdBoton)
+				SetImageButton(IdButton)
 				return
 			}
-			MsgBox,,Button ID, Clicked button Id is: %IdBoton%
+			MsgBox,,Button ID, Clicked button Id is: %IdButton%
 			return
 		}
 		if GetKeyState("Alt")
 		{
-			;CambiarImagenAlternativaBoton(BotonAPulsar, IdBoton)
+			;ChangeAlternativeImageButton(ButtonAPress, IdButton)
 			return
 		}
 		if GetKeyState("Shift")
 		{
-			EditarScriptBoton(IdBoton)
+			EditScriptButton(IdButton)
 			return
 		}
 		i = 1
-		while(i <= BotonesCarpetas0)
+		while(i <= ButtonsFolders0)
 		{
-			BotonIteracion := BotonesCarpetas%i%
-			if(IdBoton = BotonIteracion)
+			ButtonIteration := ButtonsFolders%i%
+			if(IdButton = ButtonIteration)
 			{
-				EnCarpeta = 1
-				CarpetaBoton := CarpetasBotones%i%
-				global PaginaCarpeta := 0
-				EstablecerPaginaCarpeta(CarpetaBoton, PaginaCarpeta)
+				InFolder = 1
+				ButtonFolder := FoldersButtons%i%
+				global FolderPage := 0
+				SetFolderPage(ButtonFolder, FolderPage)
 				return
 			}
 			i++
 		}
 		j = 1
-		while(j <= BotonesDuales0)
+		while(j <= DualButtons0)
 		{
-			if(IdBoton = BotonesDuales%j%)
+			if(IdButton = DualButtons%j%)
 			{
-				if(EstadosBotonesDuales[j] = 0)
+				if(DualButtonsStates[j] = 0)
 				{
-					IdVisual := IdBoton "Enabled"
-					EstadosBotonesDuales[j] := 1
+					IdVisual := IdButton "Enabled"
+					DualButtonsStates[j] := 1
 				}
 				else
 				{
-					IdVisual := IdBoton
-					EstadosBotonesDuales[j] := 0
+					IdVisual := IdButton
+					DualButtonsStates[j] := 0
 				}
-				Boton%BotonAPulsar% = 1
-				EjecutarFuncionBoton(BotonAPulsar, IdVisual)
+				Button%ButtonAPress% = 1
+				ExecuteFunctionButton(ButtonAPress, IdVisual)
 				return
 			}
 			j++
 		}
-		IdVisual := IdBoton
-		EjecutarFuncionBoton(BotonAPulsar, IdVisual)
+		IdVisual := IdButton
+		ExecuteFunctionButton(ButtonAPress, IdVisual)
 	}
-	Boton%BotonAPulsar% = 1
+	Button%ButtonAPress% = 1
 }
 
-EstablecerPagina(NumeroPagina)
+SetPage(PageNumber)
 {
 	global
-	if(!cargaProgresivaIconos)
+	if(!ProgressLoadingIcons)
 		DllCall("LockWindowUpdate", "UInt", windowHandler)
-	CarpetaBoton := ""
-	RutaBoton1 := CarpetaBoton 15*NumeroPagina+1 ".png"
-	RutaBoton2 := CarpetaBoton 15*NumeroPagina+2 ".png"
-	RutaBoton3 := CarpetaBoton 15*NumeroPagina+3 ".png"
-	RutaBoton4 := CarpetaBoton 15*NumeroPagina+4 ".png"
-	RutaBoton5 := CarpetaBoton 15*NumeroPagina+5 ".png"
-	RutaBoton6 := CarpetaBoton 15*NumeroPagina+6 ".png"
-	RutaBoton7 := CarpetaBoton 15*NumeroPagina+7 ".png"
-	RutaBoton8 := CarpetaBoton 15*NumeroPagina+8 ".png"
-	RutaBoton9 := CarpetaBoton 15*NumeroPagina+9 ".png"
-	RutaBoton10 := CarpetaBoton 15*NumeroPagina+10 ".png"
-	RutaBoton11 := CarpetaBoton 15*NumeroPagina+11 ".png"
-	RutaBoton12 := CarpetaBoton 15*NumeroPagina+12 ".png"
-	RutaBoton13 := CarpetaBoton 15*NumeroPagina+13 ".png"
-	RutaBoton14 := CarpetaBoton 15*NumeroPagina+14 ".png"
-	RutaBoton15 := CarpetaBoton 15*NumeroPagina+15 ".png"
+	ButtonFolder := ""
+	Button1Path := ButtonFolder 15*PageNumber+1 ".png"
+	Button2Path := ButtonFolder 15*PageNumber+2 ".png"
+	Button3Path := ButtonFolder 15*PageNumber+3 ".png"
+	Button4Path := ButtonFolder 15*PageNumber+4 ".png"
+	Button5Path := ButtonFolder 15*PageNumber+5 ".png"
+	Button6Path := ButtonFolder 15*PageNumber+6 ".png"
+	Button7Path := ButtonFolder 15*PageNumber+7 ".png"
+	Button8Path := ButtonFolder 15*PageNumber+8 ".png"
+	Button9Path := ButtonFolder 15*PageNumber+9 ".png"
+	Button1Path0 := ButtonFolder 15*PageNumber+10 ".png"
+	Button1Path1 := ButtonFolder 15*PageNumber+11 ".png"
+	Button1Path2 := ButtonFolder 15*PageNumber+12 ".png"
+	Button1Path3 := ButtonFolder 15*PageNumber+13 ".png"
+	Button1Path4 := ButtonFolder 15*PageNumber+14 ".png"
+	Button1Path5 := ButtonFolder 15*PageNumber+15 ".png"
 	
 	if(MiniClient)
 	{
-		RefrescarBotonesMini()
+		RefreshMiniButtons()
 	}
 	else
 	{
-		RefrescarBotones()
+		RefreshButtons()
 	}
 	DllCall("LockWindowUpdate", "UInt", 0)
 }
 
-EstablecerPaginaCarpeta(CarpetaBoton, PaginaCarpeta)
+SetFolderPage(ButtonFolder, FolderPage)
 {
 	global
-	if(!cargaProgresivaIconos)
+	if(!ProgressLoadingIcons)
 		DllCall("LockWindowUpdate", "UInt", windowHandler)
-	RutaBoton1 := CarpetaBoton 15*PaginaCarpeta+1 ".png"
-	RutaBoton2 := CarpetaBoton 15*PaginaCarpeta+2 ".png"
-	RutaBoton3 := CarpetaBoton 15*PaginaCarpeta+3 ".png"
-	RutaBoton4 := CarpetaBoton 15*PaginaCarpeta+4 ".png"
-	RutaBoton5 := CarpetaBoton 15*PaginaCarpeta+5 ".png"
-	RutaBoton6 := CarpetaBoton 15*PaginaCarpeta+6 ".png"
-	RutaBoton7 := CarpetaBoton 15*PaginaCarpeta+7 ".png"
-	RutaBoton8 := CarpetaBoton 15*PaginaCarpeta+8 ".png"
-	RutaBoton9 := CarpetaBoton 15*PaginaCarpeta+9 ".png"
-	RutaBoton10 := CarpetaBoton 15*PaginaCarpeta+10 ".png"
-	RutaBoton11 := CarpetaBoton 15*PaginaCarpeta+11 ".png"
-	RutaBoton12 := CarpetaBoton 15*PaginaCarpeta+12 ".png"
-	RutaBoton13 := CarpetaBoton 15*PaginaCarpeta+13 ".png"
-	RutaBoton14 := CarpetaBoton 15*PaginaCarpeta+14 ".png"
+	Button1Path := ButtonFolder 15*FolderPage+1 ".png"
+	Button2Path := ButtonFolder 15*FolderPage+2 ".png"
+	Button3Path := ButtonFolder 15*FolderPage+3 ".png"
+	Button4Path := ButtonFolder 15*FolderPage+4 ".png"
+	Button5Path := ButtonFolder 15*FolderPage+5 ".png"
+	Button6Path := ButtonFolder 15*FolderPage+6 ".png"
+	Button7Path := ButtonFolder 15*FolderPage+7 ".png"
+	Button8Path := ButtonFolder 15*FolderPage+8 ".png"
+	Button9Path := ButtonFolder 15*FolderPage+9 ".png"
+	Button1Path0 := ButtonFolder 15*FolderPage+10 ".png"
+	Button1Path1 := ButtonFolder 15*FolderPage+11 ".png"
+	Button1Path2 := ButtonFolder 15*FolderPage+12 ".png"
+	Button1Path3 := ButtonFolder 15*FolderPage+13 ".png"
+	Button1Path4 := ButtonFolder 15*FolderPage+14 ".png"
 		
 	if(MiniClient)
 	{
-		RefrescarBotonesMini(true)
+		RefreshMiniButtons(true)
 	}
 	else
 	{
-		RefrescarBotones(true)
+		RefreshButtons(true)
 	}
 	DllCall("LockWindowUpdate", "UInt", 0)
 }
 
-RefrescarBotones(esCarpeta = false)
+RefreshButtons(isFolder = false)
 {
 	global
-	if(!cargaProgresivaIconos)
+	if(!ProgressLoadingIcons)
 		DllCall("LockWindowUpdate", "UInt", windowHandler)
-	GuiControl, Text, Boton1, resources\img\%RutaBoton1%
-	GuiControl, MoveDraw, Boton1, x130 y50 w130 h130 ; Al cambiarle la ruta hay que resizear el boton
-	GuiControl, Text, Boton2, resources\img\%RutaBoton2%
-	GuiControl, MoveDraw, Boton2, x290 y50 w130 h130
-	GuiControl, Text, Boton3, resources\img\%RutaBoton3%
-	GuiControl, MoveDraw, Boton3, x450 y50 w130 h130
-	GuiControl, Text, Boton4, resources\img\%RutaBoton4%
-	GuiControl, MoveDraw, Boton4, x610 y50 w130 h130
-	GuiControl, Text, Boton5, resources\img\%RutaBoton5%
-	GuiControl, MoveDraw, Boton5, x770 y50 w130 h130
-	GuiControl, Text, Boton6, resources\img\%RutaBoton6%
-	GuiControl, MoveDraw, Boton6, x130 w130 y230 h130
-	GuiControl, Text, Boton7, resources\img\%RutaBoton7%
-	GuiControl, MoveDraw, Boton7, x290 w130 y230 h130
-	GuiControl, Text, Boton8, resources\img\%RutaBoton8%
-	GuiControl, MoveDraw, Boton8, x450 w130 y230 h130
-	GuiControl, Text, Boton9, resources\img\%RutaBoton9%
-	GuiControl, MoveDraw, Boton9, x610 w130 y230 h130
-	GuiControl, Text, Boton10, resources\img\%RutaBoton10%
-	GuiControl, MoveDraw, Boton10, x770 y230 w130 h130
-	GuiControl, Text, Boton11, resources\img\%RutaBoton11%
-	GuiControl, MoveDraw, Boton11, x130 x130 y410 w130 h130
-	GuiControl, Text, Boton12, resources\img\%RutaBoton12%
-	GuiControl, MoveDraw, Boton12, x290 y410 w130 h130
-	GuiControl, Text, Boton13, resources\img\%RutaBoton13%
-	GuiControl, MoveDraw, Boton13, x450 y410 w130 h130
-	GuiControl, Text, Boton14, resources\img\%RutaBoton14%
-	GuiControl, MoveDraw, Boton14, x610 y410 w130 h130
-	if(esCarpeta)
+	GuiControl, Text, Button1, resources\img\%Button1Path%
+	GuiControl, MoveDraw, Button1, x130 y50 w130 h130 ; When changing the path, you have to resize the button
+	GuiControl, Text, Button2, resources\img\%Button2Path%
+	GuiControl, MoveDraw, Button2, x290 y50 w130 h130
+	GuiControl, Text, Button3, resources\img\%Button3Path%
+	GuiControl, MoveDraw, Button3, x450 y50 w130 h130
+	GuiControl, Text, Button4, resources\img\%Button4Path%
+	GuiControl, MoveDraw, Button4, x610 y50 w130 h130
+	GuiControl, Text, Button5, resources\img\%Button5Path%
+	GuiControl, MoveDraw, Button5, x770 y50 w130 h130
+	GuiControl, Text, Button6, resources\img\%Button6Path%
+	GuiControl, MoveDraw, Button6, x130 w130 y230 h130
+	GuiControl, Text, Button7, resources\img\%Button7Path%
+	GuiControl, MoveDraw, Button7, x290 w130 y230 h130
+	GuiControl, Text, Button8, resources\img\%Button8Path%
+	GuiControl, MoveDraw, Button8, x450 w130 y230 h130
+	GuiControl, Text, Button9, resources\img\%Button9Path%
+	GuiControl, MoveDraw, Button9, x610 w130 y230 h130
+	GuiControl, Text, Button10, resources\img\%Button1Path0%
+	GuiControl, MoveDraw, Button10, x770 y230 w130 h130
+	GuiControl, Text, Button11, resources\img\%Button1Path1%
+	GuiControl, MoveDraw, Button11, x130 x130 y410 w130 h130
+	GuiControl, Text, Button12, resources\img\%Button1Path2%
+	GuiControl, MoveDraw, Button12, x290 y410 w130 h130
+	GuiControl, Text, Button13, resources\img\%Button1Path3%
+	GuiControl, MoveDraw, Button13, x450 y410 w130 h130
+	GuiControl, Text, Button14, resources\img\%Button1Path4%
+	GuiControl, MoveDraw, Button14, x610 y410 w130 h130
+	if(isFolder)
 	{
-		GuiControl, Text, Boton15, resources\img\Volver.png
-		GuiControl, MoveDraw, Boton15, x770 y410 w130 h130	
+		GuiControl, Text, Button15, resources\img\Volver.png
+		GuiControl, MoveDraw, Button15, x770 y410 w130 h130	
 	}
 	else
 	{
-		GuiControl, Text, Boton15, resources\img\%RutaBoton15%
-		GuiControl, MoveDraw, Boton15, x770 y410 w130 h130		
+		GuiControl, Text, Button15, resources\img\%Button1Path5%
+		GuiControl, MoveDraw, Button15, x770 y410 w130 h130		
 	}
 	DllCall("LockWindowUpdate", "UInt", 0)
 }
 
-RefrescarBotonesMini(esCarpeta = false)
+RefreshMiniButtons(isFolder = false)
 {
 	global
-	if(!cargaProgresivaIconos)
+	if(!ProgressLoadingIcons)
 		DllCall("LockWindowUpdate", "UInt", windowHandler)
-	GuiControl, Text, Boton1, resources\img\%RutaBoton1%
-	GuiControl, MoveDraw, Boton1, x59 y19 w49 h49
-	GuiControl, Text, Boton2, resources\img\%RutaBoton2%
-	GuiControl, MoveDraw, Boton2, x115 y19 w49 h49
-	GuiControl, Text, Boton3, resources\img\%RutaBoton3%
-	GuiControl, MoveDraw, Boton3, x171 y19 w49 h49
-	GuiControl, Text, Boton4, resources\img\%RutaBoton4%
-	GuiControl, MoveDraw, Boton4, x227 y19 w49 h49
-	GuiControl, Text, Boton5, resources\img\%RutaBoton5%
-	GuiControl, MoveDraw, Boton5, x283 y19 w49 h49
-	GuiControl, Text, Boton6, resources\img\%RutaBoton6%
-	GuiControl, MoveDraw, Boton6, x59 y75 w49 h49
-	GuiControl, Text, Boton7, resources\img\%RutaBoton7%
-	GuiControl, MoveDraw, Boton7, x115 y75 w49 h49
-	GuiControl, Text, Boton8, resources\img\%RutaBoton8%
-	GuiControl, MoveDraw, Boton8, x171 y75 w49 h49
-	GuiControl, Text, Boton9, resources\img\%RutaBoton9%
-	GuiControl, MoveDraw, Boton9, x227 y75 w49 h49
-	GuiControl, Text, Boton10, resources\img\%RutaBoton10%
-	GuiControl, MoveDraw, Boton10, x283 y75 w49 h49
-	GuiControl, Text, Boton11, resources\img\%RutaBoton11%
-	GuiControl, MoveDraw, Boton11, x59 y131 w49 h49
-	GuiControl, Text, Boton12, resources\img\%RutaBoton12%
-	GuiControl, MoveDraw, Boton12, x115 y131 w49 h49
-	GuiControl, Text, Boton13, resources\img\%RutaBoton13%
-	GuiControl, MoveDraw, Boton13, x171 y131 w49 h49
-	GuiControl, Text, Boton14, resources\img\%RutaBoton14%
-	GuiControl, MoveDraw, Boton14, x227 y131 w49 h49
-	if(esCarpeta)
+	GuiControl, Text, Button1, resources\img\%Button1Path%
+	GuiControl, MoveDraw, Button1, x59 y19 w49 h49
+	GuiControl, Text, Button2, resources\img\%Button2Path%
+	GuiControl, MoveDraw, Button2, x115 y19 w49 h49
+	GuiControl, Text, Button3, resources\img\%Button3Path%
+	GuiControl, MoveDraw, Button3, x171 y19 w49 h49
+	GuiControl, Text, Button4, resources\img\%Button4Path%
+	GuiControl, MoveDraw, Button4, x227 y19 w49 h49
+	GuiControl, Text, Button5, resources\img\%Button5Path%
+	GuiControl, MoveDraw, Button5, x283 y19 w49 h49
+	GuiControl, Text, Button6, resources\img\%Button6Path%
+	GuiControl, MoveDraw, Button6, x59 y75 w49 h49
+	GuiControl, Text, Button7, resources\img\%Button7Path%
+	GuiControl, MoveDraw, Button7, x115 y75 w49 h49
+	GuiControl, Text, Button8, resources\img\%Button8Path%
+	GuiControl, MoveDraw, Button8, x171 y75 w49 h49
+	GuiControl, Text, Button9, resources\img\%Button9Path%
+	GuiControl, MoveDraw, Button9, x227 y75 w49 h49
+	GuiControl, Text, Button10, resources\img\%Button1Path0%
+	GuiControl, MoveDraw, Button10, x283 y75 w49 h49
+	GuiControl, Text, Button11, resources\img\%Button1Path1%
+	GuiControl, MoveDraw, Button11, x59 y131 w49 h49
+	GuiControl, Text, Button12, resources\img\%Button1Path2%
+	GuiControl, MoveDraw, Button12, x115 y131 w49 h49
+	GuiControl, Text, Button13, resources\img\%Button1Path3%
+	GuiControl, MoveDraw, Button13, x171 y131 w49 h49
+	GuiControl, Text, Button14, resources\img\%Button1Path4%
+	GuiControl, MoveDraw, Button14, x227 y131 w49 h49
+	if(isFolder)
 	{
-		GuiControl, Text, Boton15, resources\img\Volver.png
-		GuiControl, MoveDraw, Boton15, x283 y131 w49 h49
+		GuiControl, Text, Button15, resources\img\Volver.png
+		GuiControl, MoveDraw, Button15, x283 y131 w49 h49
 	}
 	else
 	{
-		GuiControl, Text, Boton15, resources\img\%RutaBoton15%
-		GuiControl, MoveDraw, Boton15, x283 y131 w49 h49
+		GuiControl, Text, Button15, resources\img\%Button1Path5%
+		GuiControl, MoveDraw, Button15, x283 y131 w49 h49
 	}
 	DllCall("LockWindowUpdate", "UInt", 0)
 }
 
 LeftPage:
-	if(MoverRatonAlPulsarBoton)
-		MouseMove, %Pantalla_Mitad_X%, %Pantalla_Mitad_Y%, 0
+	if(MoveMouseOnButtonPress)
+		MouseMove, %Screen_Half_X%, %Screen_Half_Y%, 0
 	AltTab()
-	if(EnCarpeta)
+	if(InFolder)
 	{
-		if(PaginaCarpeta != 0)
+		if(FolderPage != 0)
 		{
 			if GetKeyState("Control")
 			{
-				if(PaginaCarpeta >= 10)
+				if(FolderPage >= 10)
 				{
-					PaginaCarpeta := PaginaCarpeta - 10
-					EstablecerPaginaCarpeta(CarpetaBoton, PaginaCarpeta)
+					FolderPage := FolderPage - 10
+					SetFolderPage(ButtonFolder, FolderPage)
 				}
 				return
 			}
-			PaginaCarpeta--
-			EstablecerPaginaCarpeta(CarpetaBoton, PaginaCarpeta)
+			FolderPage--
+			SetFolderPage(ButtonFolder, FolderPage)
 		}
 	}
 	else
 	{
-		if(NumeroPagina != 0)
+		if(PageNumber != 0)
 		{
 			if GetKeyState("Control")
 			{
-				if(NumeroPagina >= 10)
+				if(PageNumber >= 10)
 				{
-					NumeroPagina := NumeroPagina - 10
-					EstablecerPagina(NumeroPagina)
+					PageNumber := PageNumber - 10
+					SetPage(PageNumber)
 				}
 			}
 			else
 			{
-				NumeroPagina--
-				EstablecerPagina(NumeroPagina)
+				PageNumber--
+				SetPage(PageNumber)
 			}
 		}
 	}
 return
 
 RightPage:
-	if(MoverRatonAlPulsarBoton)
-		MouseMove, %Pantalla_Mitad_X%, %Pantalla_Mitad_Y%, 0
+	if(MoveMouseOnButtonPress)
+		MouseMove, %Screen_Half_X%, %Screen_Half_Y%, 0
 	AltTab()
-	if(EnCarpeta)
+	if(InFolder)
 	{
 		if GetKeyState("Control")
 		{
-			PaginaCarpeta := PaginaCarpeta + 10
-			EstablecerPaginaCarpeta(CarpetaBoton, PaginaCarpeta)
+			FolderPage := FolderPage + 10
+			SetFolderPage(ButtonFolder, FolderPage)
 			return
 		}
-		PaginaCarpeta++
-		EstablecerPaginaCarpeta(CarpetaBoton, PaginaCarpeta)
+		FolderPage++
+		SetFolderPage(ButtonFolder, FolderPage)
 	}
 	else
 	{
 		if GetKeyState("Control")
 		{
-			NumeroPagina := NumeroPagina + 10
+			PageNumber := PageNumber + 10
 		}
 		else
 		{
-			NumeroPagina++
+			PageNumber++
 		}
-		EstablecerPagina(NumeroPagina)
+		SetPage(PageNumber)
 	}
 return
 
-EstablecerImagenBoton(IdBoton)
+SetImageButton(IdButton)
 {
 	OnMessage(0x44, "OnMsgBox")
 	MsgBoxBtn1 = Change Img
@@ -1197,16 +1197,16 @@ EstablecerImagenBoton(IdBoton)
 	OnMessage(0x44, "")
 
 	IfMsgBox Yes, {
-		FileSelectFile, ImagenAEstablecer, ,,,*.jpg; *.png; *.gif; *.jpeg; *.bmp; *.ico
-		if ImagenAEstablecer =
+		FileSelectFile, ImagenASet, ,,,*.jpg; *.png; *.gif; *.jpeg; *.bmp; *.ico
+		if ImagenASet =
 			MsgBox, No image selected!
 		else
 		{
-			FileCopy, %ImagenAEstablecer%, ./resources/img/%IdBoton%.png, 1
+			FileCopy, %ImagenASet%, ./resources/img/%IdButton%.png, 1
 		}
 	} 
 	Else IfMsgBox No, {
-		FileDelete,./resources/img/%IdBoton%.png
+		FileDelete,./resources/img/%IdButton%.png
 		OnMessage(0x44, "OnMsgBox")
 		MsgBoxBtn1 = Delete
 		MsgBoxBtn2 = Keep
@@ -1214,58 +1214,58 @@ EstablecerImagenBoton(IdBoton)
 		OnMessage(0x44, "")
 
 		IfMsgBox Yes, {
-			FileDelete, %IdBoton%.ahk
+			FileDelete, %IdButton%.ahk
 		}
 	} 
 	Else IfMsgBox Cancel, {
 		return
 	}	
 	Sleep, 300
-	if(EnCarpeta)
+	if(InFolder)
 	{
-		EstablecerPaginaCarpeta(CarpetaBoton, PaginaCarpeta)
+		SetFolderPage(ButtonFolder, FolderPage)
 	}
 	else
 	{
-		EstablecerPagina(NumeroPagina)	
+		SetPage(PageNumber)	
 	}
 }
 
-EditarScriptBoton(IdBoton)
+EditScriptButton(IdButton)
 {
 	if(!FileExist("./conf/ScriptEditorPath.txt") || !FileExist("./conf/ExtensionScripts.txt"))
 	{
 		MsgBox,,Script Editor, Select Script Editor Path
-		gosub, CambiarRutaEditor
+		gosub, ChangeEditorPath
 	}
 	else
 	{
-		if(RutaEditorScripts = "")
+		if(PathEditorScripts = "")
 		{
-			FileReadLine,RutaEditorScripts,./conf/ScriptEditorPath.txt,1
+			FileReadLine,PathEditorScripts,./conf/ScriptEditorPath.txt,1
 		}
 		if(ExtensionScripts = "")
 		{
 			FileReadLine,ExtensionScripts,./conf/ExtensionScripts.txt,1
 		}
-		RutaScript := "" IdBoton "." ExtensionScripts ""
-		if(!FileExist(RutaScript))
+		ScriptPath := "" IdButton "." ExtensionScripts ""
+		if(!FileExist(ScriptPath))
 		{
-			FileAppend,,%RutaScript%
+			FileAppend,,%ScriptPath%
 		}
-		Run, "%RutaEditorScripts%" "%RutaScript%"
+		Run, "%PathEditorScripts%" "%ScriptPath%"
 	}
 }
 
-CambiarRutaEditor:
-; Ruta Editor
-FileSelectFile, RutaEditorScripts, ,,,*.exe
-if RutaEditorScripts =
+ChangeEditorPath:
+; Path Editor
+FileSelectFile, PathEditorScripts, ,,,*.exe
+if PathEditorScripts =
 	MsgBox, No executable selected!
 else
 {
 	FileDelete, ./conf/ScriptEditorPath.txt
-	FileAppend, %RutaEditorScripts%`n, ./conf/ScriptEditorPath.txt
+	FileAppend, %PathEditorScripts%`n, ./conf/ScriptEditorPath.txt
 }
 ; Extension Scripts
 InputBox, ExtensionScripts, Button Script EXT, Insert the extension of the Scripts triggered by the buttons`nExamples`: exe`, ahk`, py`.`.`., , 500, 145,,,,,ahk
@@ -1301,99 +1301,99 @@ return
 ~^Right::
 IfWinActive, Nova Macros Client
 {
-	gosub, RightPage ; Incremento de 10 en 10
+	gosub, RightPage ; Increase of 10 in 10
 }
 return
 
 ~^Left::
 IfWinActive, Nova Macros Client
 {
-	gosub, LeftPage ; Decremento de 10 en 10
+	gosub, LeftPage ; Decrease of 10 in 10
 }
 return
 
-EjecutarFuncionBoton(BotonVisual, FicheroEjecutar)
+ExecuteFunctionButton(ButtonVisual, RunFile)
 {
-	Activacion := "Activar" BotonVisual
-	GuiControl, Show, %Activacion%
+	Activation := "Activate" ButtonVisual
+	GuiControl, Show, %Activation%
 	try
 	{
-		Run, %FicheroEjecutar%.%ExtensionScripts%
+		Run, %RunFile%.%ExtensionScripts%
 	}
-	;CambiarImagenAlternativaBoton(BotonVisual, FicheroEjecutar)
-	feedbackEjecucion.push(Activacion)
-	SetTimer, OcultarFeedbackEjecucion, 150
+	;ChangeAlternativeImageButton(ButtonVisual, RunFile)
+	feedbackExecution.push(Activation)
+	SetTimer, HideFeedbackExecution, 150
 }
 
-OcultarFeedbackEjecucion:
-	if(feedbackEjecucion.length() = 1)
+HideFeedbackExecution:
+	if(feedbackExecution.length() = 1)
 	{
-		SetTimer, OcultarFeedbackEjecucion, Off
+		SetTimer, HideFeedbackExecution, Off
 	}
-	GuiControl, Hide, % feedbackEjecucion[1]
-	feedbackEjecucion.remove(1)
+	GuiControl, Hide, % feedbackExecution[1]
+	feedbackExecution.remove(1)
 return
 
-CambiarImagenAlternativaBoton(BotonVisual, NumeroBoton)
-{ ; Deprecated, los botones no van a tener estados de momento
-	BotonPulsar := "Boton" BotonVisual
-	if(VariableCambioImagen = 0)
+ChangeAlternativeImageButton(ButtonVisual, NumberButton)
+{ ; Deprecated, buttons will not have states at the moment
+	ButtonPress := "Button" ButtonVisual
+	if(VariableChangeImage = 0)
 	{
-		RutaImagen := "resources\img\" NumeroBoton "Enabled.png"
-		if FileExist(RutaImagen)
+		ImagePath := "resources\img\" NumberButton "Enabled.png"
+		if FileExist(ImagePath)
 		{
-			GuiControl, Text, %BotonPulsar%, %RutaImagen%
+			GuiControl, Text, %ButtonPress%, %ImagePath%
 			if(MiniClient)
 			{
-				GuiControl, MoveDraw, %BotonPulsar%, w49 h49
+				GuiControl, MoveDraw, %ButtonPress%, w49 h49
 			}
 			else
 			{
-				GuiControl, MoveDraw, %BotonPulsar%, w130 h130
+				GuiControl, MoveDraw, %ButtonPress%, w130 h130
 			}
-			VariableCambioImagen := 1
+			VariableChangeImage := 1
 		}
 	}
 	else
 	{
-		RutaImagen := "resources\img\" NumeroBoton ".png"
-		if FileExist(RutaImagen)
+		ImagePath := "resources\img\" NumberButton ".png"
+		if FileExist(ImagePath)
 		{
-			GuiControl, Text, %BotonPulsar%, %RutaImagen%
+			GuiControl, Text, %ButtonPress%, %ImagePath%
 			if(MiniClient)
 			{
-				GuiControl, MoveDraw, %BotonPulsar%, w49 h49
+				GuiControl, MoveDraw, %ButtonPress%, w49 h49
 			}
 			else
 			{
-				GuiControl, MoveDraw, %BotonPulsar%, w130 h130
+				GuiControl, MoveDraw, %ButtonPress%, w130 h130
 			}
-			VariableCambioImagen := 0
+			VariableChangeImage := 0
 		}
 	}
 	return
 }
 
 CreateFolderButton:
-	InputBox, nombreCarpetaNueva, Input Folder Name, Input the folder name WITHOUT spaces or weird symbols. Samples: (Programs`,GameFolder`,OBS_Buttons...)
-	if(nombreCarpetaNueva != "" && !Instr(nombreCarpetaNueva, A_Space))
+	InputBox, NewFolderName, Input Folder Name, Input the folder name WITHOUT spaces or weird symbols. Samples: (Programs`,GameFolder`,OBS_Buttons...)
+	if(NewFolderName != "" && !Instr(NewFolderName, A_Space))
 	{
-		nuevosBotonesCarpetas := "" ; Fila 1: 1|5|25...
-		nuevosCarpetasBotones := "" ; Fila 2: OBS|Chrome|Programas...
+		newFoldersButtons := "" ; Row 1: 1|5|25...
+		newFoldersButtons := "" ; Row 2: OBS|Chrome|Prograplus...
 		i = 1
-		while(i <= BotonesCarpetas0)
+		while(i <= ButtonsFolders0)
 		{
-			BotonIteracion := BotonesCarpetas%i%
-			CarpetaBoton := CarpetasBotones%i%
-			nuevosBotonesCarpetas := nuevosBotonesCarpetas BotonIteracion "|"
-			nuevosCarpetasBotones := nuevosCarpetasBotones CarpetaBoton "|"
+			ButtonIteration := ButtonsFolders%i%
+			ButtonFolder := FoldersButtons%i%
+			newFoldersButtons := newFoldersButtons ButtonIteration "|"
+			newFoldersButtons := newFoldersButtons ButtonFolder "|"
 			i++
 		}
-		nuevosBotonesCarpetas := nuevosBotonesCarpetas BotonActivo
-		nuevosCarpetasBotones := nuevosCarpetasBotones nombreCarpetaNueva
+		newFoldersButtons := newFoldersButtons ActiveButton
+		newFoldersButtons := newFoldersButtons NewFolderName
 		FileDelete, conf\FolderButtons.txt
-		FileAppend, % nuevosBotonesCarpetas "`n" nuevosCarpetasBotones, conf\FolderButtons.txt
-		gosub, CargarBotonesCarpeta
+		FileAppend, % newFoldersButtons "`n" newFoldersButtons, conf\FolderButtons.txt
+		gosub, LoadButtonsFolder
 	}
 	else
 	{
@@ -1409,25 +1409,25 @@ DeleteFolderButton:
 	OnMessage(0x44, "")
 
 	IfMsgBox Yes, {
-		nuevosBotonesCarpetas := "" ; Fila 1: 1|5|25...
-		nuevosCarpetasBotones := "" ; Fila 2: OBS|Chrome|Programas...
+		newFoldersButtons := "" ; Row 1: 1|5|25...
+		newFoldersButtons := "" ; Row 2: OBS|Chrome|Prograplus...
 		i = 1
-		while(i <= BotonesCarpetas0)
+		while(i <= ButtonsFolders0)
 		{
-			BotonIteracion := BotonesCarpetas%i%
-			if(BotonActivo != BotonIteracion)
+			ButtonIteration := ButtonsFolders%i%
+			if(ActiveButton != ButtonIteration)
 			{
-				CarpetaBoton := CarpetasBotones%i%
-				nuevosBotonesCarpetas := nuevosBotonesCarpetas BotonIteracion "|"
-				nuevosCarpetasBotones := nuevosCarpetasBotones CarpetaBoton "|"
+				ButtonFolder := FoldersButtons%i%
+				newFoldersButtons := newFoldersButtons ButtonIteration "|"
+				newFoldersButtons := newFoldersButtons ButtonFolder "|"
 			}
 			i++
 		}
-		nuevosBotonesCarpetas:=SubStr(nuevosBotonesCarpetas,1,StrLen(nuevosBotonesCarpetas)-1) ; Remove last |
-		nuevosCarpetasBotones:=SubStr(nuevosCarpetasBotones,1,StrLen(nuevosCarpetasBotones)-1) ; Remove last |
+		newFoldersButtons:=SubStr(newFoldersButtons,1,StrLen(newFoldersButtons)-1) ; Remove last |
+		newFoldersButtons:=SubStr(newFoldersButtons,1,StrLen(newFoldersButtons)-1) ; Remove last |
 		FileDelete, conf\FolderButtons.txt
-		FileAppend, % nuevosBotonesCarpetas "`n" nuevosCarpetasBotones, conf\FolderButtons.txt
-		gosub, CargarBotonesCarpeta
+		FileAppend, % newFoldersButtons "`n" newFoldersButtons, conf\FolderButtons.txt
+		gosub, LoadButtonsFolder
 	}else{
 		return
 	}	
@@ -1441,29 +1441,29 @@ DeleteButtonFunction:
 	OnMessage(0x44, "")
 
 	IfMsgBox Yes, {
-		FileDelete, %BotonActivo%.ahk
+		FileDelete, %ActiveButton%.ahk
 	}
 return
 
-CargarBotonesCarpeta:
-	;~ Cargar Botones asociados a carpetas
-	NumeroLoop := 1
+LoadButtonsFolder:
+	;~ Load Buttons associated with folders
+	NumberLoop := 1
 	Loop, read, ./conf/FolderButtons.txt
 	{
 		StringSplit, LineArray, A_LoopReadLine, %A_Tab%
-		if(NumeroLoop == "1")
+		if(NumberLoop == "1")
 		{
-			BotonesCarpetasRead := LineArray1
+			ButtonsFoldersRead := LineArray1
 		}
-		else if(NumeroLoop == "2")
+		else if(NumberLoop == "2")
 		{
-			CarpetasBotonesRead := LineArray1
+			FoldersButtonsRead := LineArray1
 		}
-		NumeroLoop++
+		NumberLoop++
 	}
-	StringSplit, BotonesCarpetas, BotonesCarpetasRead, |,
-	StringSplit, CarpetasBotones, CarpetasBotonesRead, |,
-	global BotonesCarpetas0
+	StringSplit, ButtonsFolders, ButtonsFoldersRead, |,
+	StringSplit, FoldersButtons, FoldersButtonsRead, |,
+	global ButtonsFolders0
 return
 
 OnMsgBox() {
@@ -1480,7 +1480,7 @@ OnMsgBox() {
 AltTab(){
 	global
 	; Alt tab replacement, faster, less distracting
-	if(enviarAltTabAlPulsarBoton)
+	if(SendAltTabOnButtonPress)
 	{
 		list := ""
 		WinGet, id, list

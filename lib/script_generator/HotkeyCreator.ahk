@@ -73,16 +73,16 @@ Create:
 		OnMessage(0x44, "")
 
 		IfMsgBox Yes, {
-			Generar()
+			Trigger()
 		}
 	}
 	else
 	{
-		Generar()
+		Trigger()
 	}
 return
 
-Generar()
+Trigger()
 {
     Gui, Submit, NoHide
     Key := SubStr(Edt1, StrLen(Edt1), 1)
@@ -97,85 +97,85 @@ Generar()
     }
     if(!plusKey)
     {
-        mas := InStr(Edt1,"+",0,0)
-        acento := InStr(Edt1,"^",0,0)
-        admiracion := InStr(Edt1,"!",0,0)
-        if(mas > acento && mas > admiracion)
+        plus := InStr(Edt1,"+",0,0)
+        accent := InStr(Edt1,"^",0,0)
+        exclamation := InStr(Edt1,"!",0,0)
+        if(plus > accent && plus > exclamation)
         {
-            Modificadores := SubStr(Edt1, 1, mas)
+            Modifiers := SubStr(Edt1, 1, plus)
         }
-        else if(acento > mas && acento > admiracion)
+        else if(accent > plus && accent > exclamation)
         {
-            Modificadores := SubStr(Edt1, 1, acento)
+            Modifiers := SubStr(Edt1, 1, accent)
         }
-        else if(admiracion > acento && admiracion > mas)
+        else if(exclamation > accent && exclamation > plus)
         {
-            Modificadores := SubStr(Edt1, 1, admiracion)
+            Modifiers := SubStr(Edt1, 1, exclamation)
         }
-        if(mas = 0 && acento = 0 && admiracion = 0 && WindowsKey = 0)
+        if(plus = 0 && accent = 0 && exclamation = 0 && WindowsKey = 0)
         {
-            hayModificadores := 0
+            areModifiers := 0
         }else
         {
-            hayModificadores := 1
+            areModifiers := 1
         }
-        StringReplace, Key, Edt1, %Modificadores%,,All
+        StringReplace, Key, Edt1, %Modifiers%,,All
         Key = {%Key%}
     }
     else
     {
-        mas := InStr(EdtNoPlusKey,"+",0,0)
-        acento := InStr(EdtNoPlusKey,"^",0,0)
-        admiracion := InStr(EdtNoPlusKey,"!",0,0)
-        if(mas > acento && mas > admiracion)
+        plus := InStr(EdtNoPlusKey,"+",0,0)
+        accent := InStr(EdtNoPlusKey,"^",0,0)
+        exclamation := InStr(EdtNoPlusKey,"!",0,0)
+        if(plus > accent && plus > exclamation)
         {
-            Modificadores := SubStr(EdtNoPlusKey, 1, mas)
+            Modifiers := SubStr(EdtNoPlusKey, 1, plus)
         }
-        else if(acento > mas && acento > admiracion)
+        else if(accent > plus && accent > exclamation)
         {
-            Modificadores := SubStr(EdtNoPlusKey, 1, acento)
+            Modifiers := SubStr(EdtNoPlusKey, 1, accent)
         }
-        else if(admiracion > acento && admiracion > mas)
+        else if(exclamation > accent && exclamation > plus)
         {
-            Modificadores := SubStr(EdtNoPlusKey, 1, admiracion)
+            Modifiers := SubStr(EdtNoPlusKey, 1, exclamation)
         }
-        if(mas = 0 && acento = 0 && admiracion = 0 && WindowsKey = 0)
+        if(plus = 0 && accent = 0 && exclamation = 0 && WindowsKey = 0)
         {
-            hayModificadores := 0
+            areModifiers := 0
         }else
         {
-            hayModificadores := 1
+            areModifiers := 1
         }
         Key := "+"
     }
     
-    strModificadoresDown := ""
-    strModificadoresUp := ""
-    if(Instr(Modificadores, "!"))
+    strModifiersDown := ""
+    strModifiersUp := ""
+    if(Instr(Modifiers, "!"))
     {
         alt := 1
-        strModificadoresDown := strModificadoresDown "{Alt Down}"
-        strModificadoresUp := strModificadoresUp "{Alt Up}"
+        strModifiersDown := strModifiersDown "{Alt Down}"
+        strModifiersUp := strModifiersUp "{Alt Up}"
     }
     else
     {
         alt := 0
     }
-    if(Instr(Modificadores, "^"))
+    if(Instr(Modifiers, "^"))
     {
         control := 1
-        strModificadoresDown := strModificadoresDown "{Control Down}"
-        strModificadoresUp := strModificadoresUp "{Control Up}"
+        strModifiersDown := strModifiersDown "{Control Down}"
+        strModifiersUp := strModifiersUp "{Control Up}"
     }
     else
     {
         control := 0
     }
-    if(Instr(Modificadores, "+"))
+    if(Instr(Modifiers, "+"))
     {
         shift := 1
-        strModificadoresDown := strModificadoresDown "{Shift Down}"
-        strModificadoresUp := strModificadoresUp "{Shift Up}"
+        strModifiersDown := strModifiersDown "{Shift Down}"
+        strModifiersUp := strModifiersUp "{Shift Up}"
     }
     else
     {
@@ -183,14 +183,14 @@ Generar()
     }
     if(WindowsKey)
     {
-        strModificadoresDown := strModificadoresDown "{LWin Down}"
-        strModificadoresUp := strModificadoresUp "{LWin Up}"
+        strModifiersDown := strModifiersDown "{LWin Down}"
+        strModifiersUp := strModifiersUp "{LWin Up}"
     }
     if(delay != "")
     {
         delay := "Sleep, " delay*1000
     }
-    if(!hayModificadores)
+    if(!areModifiers)
     {
 		src =
 		(Ltrim
@@ -211,11 +211,11 @@ Generar()
             SetBatchLines, -1
             #NoTrayIcon
             %delay%
-            Send, %strModificadoresDown%
+            Send, %strModifiersDown%
             Sleep, 30
             Send, %Key%
             Sleep, 30
-            Send, %strModificadoresUp%
+            Send, %strModifiersUp%
             Sleep, 30
         )
     }

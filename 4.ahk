@@ -2,5 +2,5 @@
 #SingleInstance, Force
 SetBatchLines, -1
 #NoTrayIcon
-SetWorkingDir C:\Users\victo\Desktop
-Run,  https://github.com/elmodo7
+SetWorkingDir C:\Users\%A_UserName%\Desktop
+Run,  https://github.com/
