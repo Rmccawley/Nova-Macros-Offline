@@ -1,5 +1,4 @@
 ﻿#NoTrayIcon
-#NoEnv
 #SingleInstance Force
-SetBatchLines -1
-Send, {Volume_Mute}
+
+Send "{Volume_Mute}"

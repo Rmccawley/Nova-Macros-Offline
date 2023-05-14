@@ -1,5 +1,4 @@
 ﻿#NoTrayIcon
-#NoEnv
 #SingleInstance Force
-SetBatchLines -1
-Send, {Media_Prev}
+
+Send "{Media_Prev}"

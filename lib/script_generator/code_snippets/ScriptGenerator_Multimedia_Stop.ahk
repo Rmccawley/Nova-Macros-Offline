@@ -1,5 +1,4 @@
 ﻿#NoTrayIcon
-#NoEnv
 #SingleInstance Force
-SetBatchLines -1
-Send, {Media_Stop}
+
+Send "{Media_Stop}"

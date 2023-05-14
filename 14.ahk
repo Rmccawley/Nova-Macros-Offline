@@ -1,6 +1,4 @@
-#NoEnv
-#SingleInstance, Force
-SetBatchLines, -1
+#SingleInstance Force
 #NoTrayIcon
-SetWorkingDir C:\Users\%A_UserName%\Desktop
-Run,  https://www.youtube.com/
+SetWorkingDir "C:\Users\%A_UserName%\Desktop"
+Run  "https://www.youtube.com/"

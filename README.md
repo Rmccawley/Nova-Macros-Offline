@@ -18,7 +18,7 @@ Download AutoHotkey from [here](https://www.autohotkey.com/)
 
 Extract source to "C:\ProgramData\Nova Macros"
 
-Run Nova Macros Client Offline.ahk
+Run "Nova Macros Client" Offline.ahk
 
 
 Usage:

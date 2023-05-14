@@ -1,16 +1,16 @@
-#NoEnv
-#SingleInstance, Force
-SetBatchLines, -1
+;Notice: This document has been modified from the original work by Rmccawley 
+
+#SingleInstance Force
 #NoTrayIcon
-SetWorkingDir C:\Windows\System32
+SetWorkingDir "C:\Windows\System32"
 
 global Executable := "mspaint.exe"
 
-IfWinExist, ahk_exe %Executable%
+If WinExist(ahk_exe %Executable%)
 {
-	WinActivate, ahk_exe %Executable%
+	WinActivate ahk_exe %Executable%
 }
 else
 {
-	Run, C:\Windows\System32\mspaint.exe
+	Run "C:\Windows\System32\mspaint.exe"
 }

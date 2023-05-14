@@ -1,3 +1,5 @@
+;Notice: This document has been modified from the original work by Rmccawley 
+
 #SingleInstance Force
 #NoEnv
 SetBatchLines -1

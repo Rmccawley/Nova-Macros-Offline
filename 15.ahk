@@ -1,2 +1,2 @@
 #NotrayIcon
-Run, %A_ScriptDir%
+Run A_ScriptDir

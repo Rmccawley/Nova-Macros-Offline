@@ -1,5 +1,4 @@
-﻿#NoEnv
-#NoTrayIcon
+﻿#NoTrayIcon
 #SingleInstance Force
-SetBatchLines -1
-Send, {Volume_Up}{Volume_Up}{Volume_Up}{Volume_Up}{Volume_Up}
+
+Send "{Volume_Up}{Volume_Up}{Volume_Up}{Volume_Up}{Volume_Up}"

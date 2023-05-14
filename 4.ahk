@@ -1,6 +1,6 @@
-#NoEnv
-#SingleInstance, Force
-SetBatchLines, -1
+;Notice: This document has been modified from the original work by Rmccawley 
+
+#SingleInstance Force
 #NoTrayIcon
-SetWorkingDir C:\Users\%A_UserName%\Desktop
-Run,  https://github.com/
+SetWorkingDir "C:\Users\%A_UserName%\Desktop"
+Run  "https://github.com/"

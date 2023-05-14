@@ -1,6 +1,4 @@
-#NoEnv
-#SingleInstance, Force
-SetBatchLines, -1
+#SingleInstance Force
 #NoTrayIcon
-SetWorkingDir C:\Windows\System32
-Run, C:\Windows\System32\cmd.exe
+SetWorkingDir "C:\Windows\System32"
+Run "C:\Windows\System32\cmd.exe"
